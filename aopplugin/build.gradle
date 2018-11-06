@@ -1,0 +1,39 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:3.1.4'
+    implementation 'com.android.tools.build:gradle-api:3.1.4'
+
+    implementation 'org.aspectj:aspectjtools:1.8.9'
+
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+//发布本地的maven仓库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('repo'))
+            //设置插件的GAV参数
+            pom.groupId = 'com.yuntian.plugin'
+            pom.artifactId = 'android-aop-plugin'
+            pom.version = 1.0
+        }
+    }
+}
