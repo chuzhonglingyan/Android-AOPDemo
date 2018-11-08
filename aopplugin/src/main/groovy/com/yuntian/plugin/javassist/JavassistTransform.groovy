@@ -53,12 +53,17 @@ class JavassistTransform extends Transform {
                 //对 jar包 类型的inputs 进行遍历
                 input.jarInputs.each {
 
+                    project.logger.error( "jar包："+it.name)
+
                     //这里处理自定义的逻辑
                     InjectUtil.injectJar(it.file.getAbsolutePath(), "com", project)
 
                     // 重命名输出文件（同目录copyFile会冲突）
                     String outputFileName = it.name.replace(".jar", "") + '-' + it.file.path.hashCode()
                     def output = outputProvider.getContentLocation(outputFileName, it.contentTypes, it.scopes, Format.JAR)
+
+                    project.logger.error( "jar包path："+output.path)
+
                     FileUtils.copyFile(it.file, output)
 
                 }
@@ -71,10 +76,14 @@ class JavassistTransform extends Transform {
                 //文件夹里面包含的是我们手写的类以及R.class、BuildConfig.class以及R$XXX.class等
                 InjectUtil.injectDir(directoryInput.file.absolutePath, "com", project)
 
+                 project.logger.error("文件夹："+directoryInput.name)
+
                 // 获取output目录
                 def dest = outputProvider.getContentLocation(directoryInput.name,
                         directoryInput.contentTypes, directoryInput.scopes,
                         Format.DIRECTORY)
+
+                 project.logger.error("文件夹dest："+dest.path)
 
                 // 将input的目录复制到output指定目录
                 FileUtils.copyDirectory(directoryInput.file, dest)
