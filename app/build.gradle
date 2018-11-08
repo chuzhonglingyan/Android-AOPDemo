@@ -3,6 +3,15 @@ import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
 
 apply plugin: 'com.android.application'
+apply plugin: 'yuntian-plugin'
+apply plugin: 'hello-plugin'
+
+
+customPlugin{
+    name = "yuntian"
+    age = "25"
+    address = "武汉"
+}
 
 android {
     compileSdkVersion 28
@@ -20,6 +29,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -29,6 +43,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+
+    implementation 'org.aspectj:aspectjrt:1.8.9'
+    implementation project(':aopjlib')
 }
 
 final def log = project.logger
@@ -73,3 +91,16 @@ variants.all { variant ->
         }
     }
 }
+
+//执行一个task  脚本命令：gradle hello
+//会在task本身被执行doFirst/doLast 才会被执行
+//一个Task就是一个标准的Groovy函数调用
+//task hello{
+//    doFirst{
+//        println"任务执行之前"
+//    }
+//
+//    doLast{
+//        println"任务执行之后"
+//    }
+//}

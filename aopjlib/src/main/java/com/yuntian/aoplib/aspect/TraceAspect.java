@@ -1,7 +1,7 @@
-package com.yuntian.aspectjlib.aspect;
+package com.yuntian.aoplib.aspect;
 
-import com.yuntian.aspectjlib.DebugLog;
-import com.yuntian.aspectjlib.StopWatch;
+import com.yuntian.aoplib.aspect.trace.DebugLog;
+import com.yuntian.aoplib.aspect.trace.StopWatch;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,11 +14,11 @@ public class TraceAspect {
 
     //注解作用的方法
     private static final String POINTCUT_METHOD =
-            "execution(@com.yuntian.aspectjlib.annotation.DebugTrace * *(..))";
+            "execution(@com.yuntian.aoplib.annotation.DebugTrace * *(..))";
 
     //注解作用的构造方法
     private static final String POINTCUT_CONSTRUCTOR =
-            "execution(@com.yuntian.aspectjlib.annotation.DebugTrace *.new(..))";
+            "execution(@com.yuntian.aoplib.annotation.DebugTrace *.new(..))";
 
     //方法切入点
     @Pointcut(POINTCUT_METHOD)

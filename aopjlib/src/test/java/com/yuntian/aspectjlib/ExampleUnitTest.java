@@ -1,6 +1,6 @@
 package com.yuntian.aspectjlib;
 
-import com.yuntian.aspectjlib.annotation.DebugTrace;
+import com.yuntian.aoplib.annotation.DebugTrace;
 
 import org.junit.Test;
 

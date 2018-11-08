@@ -1,4 +1,4 @@
-package com.yuntian.aspectjlib.annotation;
+package com.yuntian.aoplib.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

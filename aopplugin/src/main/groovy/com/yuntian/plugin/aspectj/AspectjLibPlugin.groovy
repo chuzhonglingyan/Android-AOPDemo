@@ -1,32 +1,28 @@
-package com.yuntian.plugin
+package com.yuntian.plugin.aspectj
 
+import com.android.build.gradle.LibraryPlugin
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 
-import org.aspectj.bridge.IMessage
-import org.aspectj.bridge.MessageHandler
-import org.aspectj.tools.ajc.Main
-
-class AspectjPlugin implements Plugin<Project> {
+class AspectjLibPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
 
         final def log = project.logger
-        final def variants = project.android.applicationVariants
+        final def variants = project.android.libraryVariants
 
-        println "-----------AspectjPlugin开始编织代码----------"
+        log.error "========================";
+        log.error "AspectjLibPlugin开始修改Class!";
+        log.error "========================";
 
-        log.debug("开始编织代码.")
+        variants.all{ variant ->
 
-        variants.all { variant ->
-
-            if (!variant.buildType.isDebuggable()) {
-                log.debug("Skipping non-debuggable build type '${variant.buildType.name}'.")
-                return;
-            }
-
+            LibraryPlugin plugin = project.plugins.getPlugin(LibraryPlugin)
             JavaCompile javaCompile = variant.javaCompile
             javaCompile.doLast {
                 String[] args = ["-showWeaveInfo",
@@ -35,11 +31,12 @@ class AspectjPlugin implements Plugin<Project> {
                                  "-aspectpath", javaCompile.classpath.asPath,
                                  "-d", javaCompile.destinationDir.toString(),
                                  "-classpath", javaCompile.classpath.asPath,
-                                 "-bootclasspath", project.android.bootClasspath.join(File.pathSeparator)]
-                log.debug "ajc args: " + Arrays.toString(args)
+                                 "-bootclasspath", plugin.project.android.bootClasspath.join(
+                        File.pathSeparator)]
 
                 MessageHandler handler = new MessageHandler(true);
-                new Main().run(args, handler);
+                new Main().run(args, handler)
+
                 for (IMessage message : handler.getMessages(null, true)) {
                     switch (message.getKind()) {
                         case IMessage.ABORT:
@@ -48,8 +45,6 @@ class AspectjPlugin implements Plugin<Project> {
                             log.error message.message, message.thrown
                             break;
                         case IMessage.WARNING:
-                            log.warn message.message, message.thrown
-                            break;
                         case IMessage.INFO:
                             log.info message.message, message.thrown
                             break;
@@ -60,6 +55,7 @@ class AspectjPlugin implements Plugin<Project> {
                 }
             }
         }
+
 
     }
 }

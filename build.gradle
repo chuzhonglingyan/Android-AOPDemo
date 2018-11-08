@@ -10,6 +10,9 @@ buildscript {
         }
 
     }
+
+    //Project对象与 build.gradle 是一对一的关系
+    //每一个配置其实就是它对应的 Project 对象的一个方法或者一个变量值
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
 
@@ -31,6 +34,7 @@ allprojects {
     }
 }
 
+//自定义的定义删除build文件的task
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
