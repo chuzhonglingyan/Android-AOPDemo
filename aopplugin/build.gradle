@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
+
+
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
@@ -25,7 +27,6 @@ repositories {
     mavenCentral()
 }
 
-
 //发布本地的maven仓库
 uploadArchives {
     repositories {
@@ -38,3 +39,22 @@ uploadArchives {
         }
     }
 }
+
+apply plugin: 'com.novoda.bintray-release'
+
+
+//添加
+publish {
+    userOrg = rootProject.userOrg
+    groupId = 'com.yuntian.plugin'
+    artifactId = 'android-aop-plugin'
+    uploadName = 'android-aop-plugin'
+    publishVersion = '1.0.0'
+    dryRun=false
+    desc = 'A plugin For Android Aop'
+    website = rootProject.website
+    bintrayUser = rootProject.bintrayUser
+    bintrayKey = rootProject.bintrayKey
+    licences = rootProject.licences
+}
+

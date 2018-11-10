@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
+
     repositories {
         google()
         jcenter()
@@ -20,6 +20,8 @@ buildscript {
         classpath 'org.aspectj:aspectjweaver:1.8.9'
 
         classpath 'com.yuntian.plugin:android-aop-plugin:1.0'
+
+        classpath 'com.novoda:bintray-release:0.8.1'//上传插件
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -37,4 +39,23 @@ allprojects {
 //自定义的定义删除build文件的task
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+//统一声明配置
+ext {
+    userOrg = 'yutianyulei'
+    website = 'https://github.com/chuzhonglinyan'
+    licences = ['Apache-2.0']
+    bintrayUser = 'yutianyulei'
+    bintrayKey = '3c61cd3362e2e95df51a587c24f26622d2c0c2fd'
+}
+
+//加上这些
+
+tasks.withType(Javadoc) {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
 }
