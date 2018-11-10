@@ -46,8 +46,16 @@ ext {
     userOrg = 'yutianyulei'
     website = 'https://github.com/chuzhonglinyan'
     licences = ['Apache-2.0']
-    bintrayUser = 'yutianyulei'
-    bintrayKey = '3c61cd3362e2e95df51a587c24f26622d2c0c2fd'
+
+    //加载资源
+    Properties properties = new Properties()
+    InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream() ;
+    properties.load( inputStream )
+
+
+    bintrayUser =  properties.getProperty('bintrayUser')
+    bintrayKey = properties.getProperty('bintrayKey')
+
 }
 
 //加上这些
