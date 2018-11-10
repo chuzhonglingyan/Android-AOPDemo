@@ -31,31 +31,13 @@ allprojects {
     repositories {
         google()
         jcenter()
-
-
     }
+    parseLocalProperties()
 }
 
 //自定义的定义删除build文件的task
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-//统一声明配置
-ext {
-    userOrg = 'yutianyulei'
-    website = 'https://github.com/chuzhonglinyan'
-    licences = ['Apache-2.0']
-
-    //加载资源
-    Properties properties = new Properties()
-    InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream() ;
-    properties.load( inputStream )
-
-
-    bintrayUser =  properties.getProperty('bintrayUser')
-    bintrayKey = properties.getProperty('bintrayKey')
-
 }
 
 //加上这些
@@ -66,4 +48,27 @@ tasks.withType(Javadoc) {
         charSet 'UTF-8'
         links "http://docs.oracle.com/javase/7/docs/api"
     }
+}
+
+
+def parseLocalProperties() {
+    File file = rootProject.file('local.properties')
+    if (file.exists()) {
+        InputStream inputStream = rootProject.file('local.properties').newDataInputStream();
+        Properties properties = new Properties()
+        properties.load(inputStream)
+
+        ext.bintrayUser = properties.getProperty('bintrayUser')
+        ext.bintrayKey = properties.getProperty('bintrayKey')
+    }
+}
+
+
+
+//统一声明配置
+ext {
+    userOrg = 'yutianyulei'
+    website = 'https://github.com/chuzhonglinyan'
+    licences = ['Apache-2.0']
+
 }
