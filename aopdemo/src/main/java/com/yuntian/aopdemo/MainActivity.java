@@ -2,13 +2,17 @@ package com.yuntian.aopdemo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import com.meituan.android.walle.WalleChannelReader;
 import com.yuntian.aoplib.annotation.DebugTrace;
 import com.yuntian.aoplib.annotation.LogTime;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    private static final String TAG = "MainActivity";
 
     private TextView tv_aspect;
     private TextView tv_javassist;
@@ -23,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
         tv_aspect.setOnClickListener((v)->{ testAnnotatedMethod();});
         tv_javassist.setOnClickListener((v)->{ testJavassistMethod();});
 
+        String channel = WalleChannelReader.getChannel(this.getApplicationContext());
+
+        Log.d(TAG, "onCreate: "+channel);
     }
 
     @DebugTrace

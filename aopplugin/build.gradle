@@ -51,10 +51,15 @@ publish {
     uploadName = 'android-aop-plugin'
     publishVersion = '1.0.0'
     dryRun=false
-    desc = 'A plugin For Android Aop'
-    website = rootProject.website
+
+    println 'bintrayUser:'+rootProject.bintrayUser
+    println 'bintrayKey:'+rootProject.bintrayKey
+
     bintrayUser = rootProject.bintrayUser
     bintrayKey = rootProject.bintrayKey
+
+    desc = 'A plugin For Android Aop'
+    website = rootProject.website
     licences = rootProject.licences
 }
 

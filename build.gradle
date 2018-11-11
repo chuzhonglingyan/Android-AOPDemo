@@ -1,5 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+
+
+
 buildscript {
 
     repositories {
@@ -9,6 +12,10 @@ buildscript {
             url uri("./aopplugin/repo")
         }
 
+    }
+
+    ext {
+        walleVersion ='1.1.6'
     }
 
     //Project对象与 build.gradle 是一对一的关系
@@ -24,6 +31,7 @@ buildscript {
         classpath 'com.novoda:bintray-release:0.8.1'//上传插件
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        classpath "com.meituan.android.walle:plugin:$rootProject.walleVersion"
     }
 }
 
@@ -60,9 +68,9 @@ def parseLocalProperties() {
 
         ext.bintrayUser = properties.getProperty('bintrayUser')
         ext.bintrayKey = properties.getProperty('bintrayKey')
+
     }
 }
-
 
 
 //统一声明配置
@@ -72,3 +80,4 @@ ext {
     licences = ['Apache-2.0']
 
 }
+
