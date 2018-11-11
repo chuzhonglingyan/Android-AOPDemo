@@ -41,18 +41,27 @@ android {
 
 
     signingConfigs {
-        release {
-            storeFile file("android.keystore")
-            storePassword "android"
-            keyAlias "android"
-            keyPassword "android"
-        }
+        //加载签名文件
+        File propFile = file('sign.properties');
+        if (propFile.exists()) {
+            Properties props = new Properties()
+            props.load(new FileInputStream(propFile))
+            release {
+                storeFile = file(props['STORE_FILE'])
+                storePassword = props['STORE_PASSWORD']
+                keyAlias = props['KEY_ALIAS']
+                keyPassword = props['KEY_PASSWORD']
 
-        debug {
-            storeFile file("android.keystore")
-            storePassword "android"
-            keyAlias "android"
-            keyPassword "android"
+            }
+
+            debug {
+                storeFile = file(props['STORE_FILE'])
+                storePassword = props['STORE_PASSWORD']
+                keyAlias = props['KEY_ALIAS']
+                keyPassword = props['KEY_PASSWORD']
+            }
+        } else {
+            println 'signingConfigs:默认使用android.debug签名，可以在sign.properties自定义签名'
         }
 
     }
@@ -60,12 +69,19 @@ android {
     buildTypes {
 
         release {
+
             signingConfig signingConfigs.release
-            minifyEnabled false
+            // 混淆
+            minifyEnabled true
+            // Zipalign优化
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
+
             signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -102,5 +118,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.aspectj:aspectjrt:1.8.9'
     implementation "com.meituan.android.walle:library:$rootProject.walleVersion"
+
+    implementation "com.blankj:free-proguard:0.0.8"
     implementation project(':aopjlib')
 }
