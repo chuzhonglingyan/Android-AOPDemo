@@ -1,10 +1,12 @@
-import org.aspectj.bridge.IMessage
-import org.aspectj.bridge.MessageHandler
-import org.aspectj.tools.ajc.Main
-
 apply plugin: 'com.android.application'
 apply plugin: 'yuntian-plugin'
 apply plugin: 'hello-plugin'
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmm')
+    return formattedDate
+}
 
 
 customPlugin{
@@ -23,16 +25,120 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+
+
+        //加载签名文件
+        File propFile = file('sign.properties');
+        if (propFile.exists()) {
+            Properties props = new Properties()
+            props.load(new FileInputStream(propFile))
+            release {
+                v1SigningEnabled true
+                v2SigningEnabled true
+                storeFile = file(props['STORE_FILE'])
+                storePassword = props['STORE_PASSWORD']
+                keyAlias = props['KEY_ALIAS']
+                keyPassword = props['KEY_PASSWORD']
+            }
+
+            debug {
+                v1SigningEnabled true
+                v2SigningEnabled true
+                storeFile = file(props['STORE_FILE'])
+                storePassword = props['STORE_PASSWORD']
+                keyAlias = props['KEY_ALIAS']
+                keyPassword = props['KEY_PASSWORD']
+            }
+        } else {
+            println 'signingConfigs:默认使用android.debug签名，可以在sign.properties自定义签名'
+        }
+
+    }
+
     buildTypes {
+
         release {
+            signingConfig signingConfigs.release
+            // 混淆
+            minifyEnabled true
+            // Zipalign优化
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+//    flavorDimensions "default" flavorDimensions "api", "mode"
+
+    flavorDimensions("money", "channel")
+
+    // 如果嫌上面写法麻烦,也可以这样简写,加上一个批量处理即可.
+    productFlavors {
+
+        vip {
+            dimension "money"
+        }
+
+        free{
+            dimension "money"
+        }
+
+        commonsoon{  dimension "channel"}
+        zhushou91{  dimension "channel"}
+//        market360{ dimension "channel"}
+//        xiaomi{  dimension "channel"}
+//        wandoujia{ dimension "channel"}
+//        yingyonghui{ dimension "channel"}
+//        jifengmarket{ dimension "channel"}
+//        mumayi{ dimension "channel"}
+//        yingyongbao{ dimension "channel"}
+//        huaweimrket{ dimension "channel"}
+//        anzhimarket{ dimension "channel"}
+    }
+    //批量处理
+    productFlavors.all {
+        flavor ->
+            if(flavor.getDimension().startsWith("channel")){
+                def channel = name.startsWith("_") ? name.substring(1) : name
+                flavor.manifestPlaceholders = [MTA_CHANNEL_VALUE: channel]
+            }
+    }
+
+    applicationVariants.all { variant ->    //批量修改Apk名字
+        variant.outputs.all { output ->
+           println  variant.applicationId
+           def filePath= output.outputFile.parent
+           if(filePath.split("${variant.flavorName}")!=null){
+               filePath=filePath.split("${variant.flavorName}")[0]+"${variant.buildType.name}"
+               println    filePath
+           }
+
+           def orgName= output.outputFile.name
+           def appName=orgName.substring(0,orgName.indexOf('-'))
+           println  appName
+          //替换的字符串
+           def fileName = "${appName}_V${variant.versionName}_${variant.flavorName}_${variant.buildType.name}_${getDate()}.apk"
+
+           variant.getPackageApplication().outputDirectory = new File(filePath)
+           outputFileName = fileName
+        }
     }
 }
 
@@ -44,53 +150,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-
-    implementation 'org.aspectj:aspectjrt:1.8.9'
-    implementation project(':aopjlib')
 }
 
-final def log = project.logger
-final def variants = project.android.applicationVariants
 
-variants.all { variant ->
-    if (!variant.buildType.isDebuggable()) {
-        log.debug("Skipping non-debuggable build type '${variant.buildType.name}'.")
-        return;
-    }
-
-    JavaCompile javaCompile = variant.javaCompile
-    javaCompile.doLast {
-        String[] args = ["-showWeaveInfo",
-                         "-1.5",
-                         "-inpath", javaCompile.destinationDir.toString(),
-                         "-aspectpath", javaCompile.classpath.asPath,
-                         "-d", javaCompile.destinationDir.toString(),
-                         "-classpath", javaCompile.classpath.asPath,
-                         "-bootclasspath", project.android.bootClasspath.join(File.pathSeparator)]
-        log.debug "ajc args: " + Arrays.toString(args)
-
-        MessageHandler handler = new MessageHandler(true);
-        new Main().run(args, handler);
-        for (IMessage message : handler.getMessages(null, true)) {
-            switch (message.getKind()) {
-                case IMessage.ABORT:
-                case IMessage.ERROR:
-                case IMessage.FAIL:
-                    log.error message.message, message.thrown
-                    break;
-                case IMessage.WARNING:
-                    log.warn message.message, message.thrown
-                    break;
-                case IMessage.INFO:
-                    log.info message.message, message.thrown
-                    break;
-                case IMessage.DEBUG:
-                    log.debug message.message, message.thrown
-                    break;
-            }
-        }
-    }
-}
 
 //执行一个task  脚本命令：gradle hello
 //会在task本身被执行doFirst/doLast 才会被执行
